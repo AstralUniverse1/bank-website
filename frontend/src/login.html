@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login Page</title>
+        <link rel="stylesheet" href="../style/styles.css">
+        <script>
+            function validateLogin()
+            {
+                userId = document.getElementById("bank_id").value;
+                password = document.querySelector("input[type='password']").value;
+                if(userId == "")
+                {
+                    alert("Please enter bank id");
+                    return false;
+                }
+                else if(userId.length < 5)
+                {
+                    alert("Bank ID must be at least 5 characters long");
+                    return false;
+                }
+                
+                if(password == "")
+                {
+                    alert("Please enter password");
+                    return false;
+                }
+                else if(password.length < 5)
+                {
+                    alert("Password must be at least 5 characters long");
+                    return false;
+                }
+
+
+                isUpper=false;
+                isLower=false;
+                isDigit=false;
+                isSpecial=false;
+
+                for(let i=0; i<password.length; i++)
+                {
+                    if(password[i] >= 'A' && password[i] <= 'Z')
+                        isUpper=true;
+                    else if(password[i] >= 'a' && password[i] <= 'z')
+                        isLower=true;
+                    else if(password[i] >= '0' && password[i] <= '9')
+                        isDigit=true;
+                    else
+                        isSpecial=true;
+                }
+
+                if(isUpper == false || isLower == false || isDigit == false || isSpecial == false)
+                {
+                    alert("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
+                    return false;
+                }
+
+                localStorage.setItem("account_number", userId);
+                return true;
+            }
+            
+            async function CheckLoginInfo()
+            {
+                userId = document.getElementById("bank_id").value;
+                password = document.querySelector("input[type='password']").value;
+
+                return fetch("http://127.0.0.1:5000/api/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "user_id": userId,
+                            "password": password
+                        })
+                    }
+                ).then(res => res.json()).then(data => {
+                    if(data.status == false)
+                {
+                    alert(data.text);
+                    return false;
+                }
+                else
+                    return true;
+                })
+            }
+            
+            async function SubmitLogin()
+            {
+                result = validateLogin();
+                if(result == false)
+                    return false;
+                
+                result = await CheckLoginInfo();
+                if(result == false)
+                    return false;
+
+                window.location.href = "/page/account"
+            }
+        </script>
+    </head>
+    <body>
+        <form>
+            <h1 class="main_header">Login Page</h1>
+            <img id="bank_img" src="../images/bank.jpg" alt="bank image" title="Bank Image">
+            
+            <label>Bank ID:</label>
+            <input id="bank_id" type="text" placeholder="Please enter bank id" />
+            
+            <label>Password:</label>
+            <input type="password" placeholder="Please enter password" />
+            
+            <button type="button" onclick="SubmitLogin()">Login</button>
+            <br/>
+            <br/>
+            <a href="/page/register">Press here to register a new user</a>
+        </form>
+    </body>
+</html>

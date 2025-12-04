@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer Money</title>
+    <link rel="stylesheet" href="../style/styles.css">
+    <script>
+        function validate_fields()
+        {
+            account_number = document.getElementById("account").value;
+            person_name = document.getElementById("name").value;
+            amount = document.getElementById("amount").value;
+
+            if(account_number.trim().length == 0)
+            {
+                alert("Please enter the account number");
+                return false;
+            }
+            else if(person_name.trim().length == 0)
+            {
+                alert("Please enter the person name");
+                return false;
+            }
+            else if(amount <= 0)
+            {
+                alert("Please enter a valid amount greater than zero");
+                return false;
+            }
+
+            return true;
+
+            window.location.href = "/page/confirmation";
+        }
+        async function CheckTransferInfo()
+        {
+            account_number = document.getElementById("account").value;
+            person_name = document.getElementById("name").value;
+            amount = document.getElementById("amount").value;
+            description = document.getElementById("notes").value;
+
+            return fetch("http://127.0.0.1:5000/api/transfer", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "from_id": localStorage.getItem("account_number"),
+                        "to_id": account_number,
+                        "person_name": person_name,
+                        "amount": amount,
+                        "description": description
+                    })
+                }
+                ).then(res => res.json()).then(data => {
+                    if(data.status == false)
+                {
+                    alert(data.text);
+                    return false;
+                }
+            else
+                return true;
+            })
+        }
+            
+        async function SubmitTransfer()
+            {
+                result = validate_fields();
+                if(result == false)
+                    return false;
+                
+                result = await CheckTransferInfo();
+                if(result == false)
+                    return false;
+
+                window.location.href = "/page/confirmation";
+            }
+    </script>
+</head>
+<body>
+    <form>
+        <h1 class="main_header">Transfer Money</h1>
+        <img id="bank_img" src="../images/bank.jpg" alt="Bank Image" title="Bank Image">
+
+        <label for="account">Account Number:</label>
+        <input type="text" id="account" placeholder="Enter account number" />
+
+        <label for="name">Person Name:</label>
+        <input type="text" id="name" placeholder="Enter recipient name" />
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" placeholder="Enter amount" />
+
+        <label for="notes">Notes:</label>
+        <input type="text" id="notes" placeholder="Optional notes" />
+
+        <button type="button" onclick="SubmitTransfer()">Transfer</button>
+
+        <a href="/page/account">Back to Account</a>
+    </form>
+</body>
+</html>

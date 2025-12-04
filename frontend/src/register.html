@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Register Page</title>
+        <link rel="stylesheet" href="../style/styles.css">
+        <script>
+            function validateRegister() {
+                id = document.getElementsByTagName("input")[0].value;
+                firstName = document.getElementsByTagName("input")[1].value;
+                lastName = document.getElementsByTagName("input")[2].value;
+                gender = document.getElementsByTagName("select")[0].value;
+                address = document.getElementsByTagName("input")[7].value;
+                email = document.getElementsByTagName("input")[3].value;
+                start_index = email.indexOf("@");
+                end_index = email.indexOf(".", start_index);
+                user_date = new Date(document.querySelector("input[type='date']").value)
+                today = new Date();
+
+                if(user_date >= today)
+                {
+                    alert("Please enter a valid birth date");
+                    return false;
+                }
+
+                if (id == "") {
+                    alert("Please enter your ID");
+                    return false;
+                }
+
+                if (firstName == "") {
+                    alert("Please enter your first name");
+                    return false;
+                }
+                if (lastName == "") {
+                    alert("Please enter your last name");
+                    return false;
+                }
+
+                if(email == "" || start_index == -1 || end_index == -1 || end_index == start_index + 1)
+                {
+                    alert("Please enter a valid email address");
+                    return false;
+                }
+
+                
+
+                if (gender == "") {
+                    alert("Please enter your gender");
+                    return false;
+                }
+                if (address == "") {
+                    alert("Please enter your address");
+                    return false;
+                }
+
+                localStorage.setItem("account_number", id);
+                return true;
+            }
+            async function SaveRegisterInfo()
+            {
+                id = document.getElementsByTagName("input")[0].value;
+                firstName = document.getElementsByTagName("input")[1].value;
+                lastName = document.getElementsByTagName("input")[2].value;
+                email = document.getElementsByTagName("input")[3].value;
+                password = document.querySelector("input[type='password']").value;
+                gender = document.getElementsByTagName("select")[0].value;
+                birth_date = document.querySelector("input[type='date']").value;
+                phone_number = document.getElementsByTagName("input")[6].value;
+                address = document.getElementsByTagName("input")[7].value;
+
+                return fetch("http://127.0.0.1:5000/api/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "user_id": id,
+                            "firstName": firstName,
+                            "lastName": lastName,
+                            "email": email,
+                            "password": password,
+                            "gender": gender,
+                            "birth_date": birth_date,
+                            "phone_number": phone_number,
+                            "address": address
+                        })
+                    }).then(res => res.json()).then(data => {
+                    if(data.status == false)
+                    {
+                        alert(data.text);
+                        return false;
+                    }
+                    else
+                        return true;
+                })
+            }
+            async function SubmitRegister()
+            {
+                result = validateRegister();
+
+                if(result == false)
+                    return false;
+
+                result = await SaveRegisterInfo();
+                if(result == false)
+                    return false;
+                else
+                    window.location.href = "/page/account";
+            }
+        </script>
+    </head>
+    <body>
+        <form>
+            <h1 class="main_header">Register Page</h1>
+            <img id="bank_img" src="../images/bank.jpg" alt="bank image" title="Bank Image">
+            <label>ID:</label>
+            <input type="text" placeholder="Please enter your ID" />
+            
+            <label>First Name:</label>
+            <input type="text" placeholder="Please enter your first name" />
+            
+            <label>Last Name:</label>
+            <input type="text" placeholder="Please enter your last name" />
+            
+            <label>Email:</label>
+            <input type="email" placeholder="Please enter your email" />
+            
+            <label>Password:</label>
+            <input type="password" placeholder="Please enter your password" />
+            
+            <label>Gender:</label>
+            <select>
+                <option value=""></option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            
+            <label>Birth Date:</label>
+            <input type="date" />
+            
+            <label>Phone Number:</label>
+            <input type="tel" placeholder="Please enter your phone number" />
+            
+            <label>Address:</label>
+            <input type="text" placeholder="Please enter your address" />
+            
+            <button type="button" onclick="SubmitRegister()">Register</button>
+            <a href="/page/login">Back to login</a>
+        </form>
+    </body>    
+</html>
