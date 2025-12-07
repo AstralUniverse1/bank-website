@@ -5,61 +5,35 @@ import json
 
 import db_handler
 
-frontend_path = os.path.abspath('../frontend')
-app = Flask(__name__, template_folder=frontend_path)
+# FRONTEND ROOT
+FRONTEND_ROOT = '/app/frontend'
 
-users = {
-    "12345": {
-        "first_name": "ofek",
-        "last_name": "matzki",
-        "email": "ofek@gmail.com",
-        "password": "Aa123!",
-        "gender": "Male",
-        "birth_date": "01/01/1970",
-        "phone_number": "0524441154",
-        "address": "aaaaaa tlv",
-        "balance": 5000
-    },
-    "98765": {
-        "first_name": "aaaaa",
-        "last_name": "bbbb",
-        "email": "kofe@gmail.com",
-        "password": "Aa123!",
-        "gender": "Male",
-        "birth_date": "01/01/1970",
-        "phone_number": "0524441154",
-        "address": "aaaaaa tlv",
-        "balance": 5000
-    }
-}
+app = Flask(
+    __name__,
+    template_folder=FRONTEND_ROOT,       # so render_template('src/login.html') works
+    static_folder=f"{FRONTEND_ROOT}/static"  # your CSS folder
+)
 
-transactions = {
 
-}
-
+# ----------------- FRONTEND ROUTES -----------------
 
 @app.route('/')
 def login_page():
     return render_template('src/login.html')
 
+# Serve ANY file inside /app/frontend (HTML, images, etc.)
+@app.route('/<path:path>')
+def serve_frontend(path):
+    full_path = os.path.join(FRONTEND_ROOT, path)
+    if os.path.exists(full_path):
+        # path like: src/register.html, images/bank.jpg
+        directory = os.path.dirname(full_path)
+        filename = os.path.basename(full_path)
+        return send_from_directory(directory, filename)
+    return abort(404)
 
-@app.route('/style/styles.css')
-def get_style_file():
-    return send_from_directory(f'{frontend_path}/style', 'styles.css')
 
-
-@app.route('/images/bank.jpg')
-def get_bank_image():
-    return send_from_directory(f'{frontend_path}/images', 'bank.jpg')
-
-
-@app.route('/page/<path:page_name>')
-def get_page_name(page_name):
-    if os.path.exists(f'{frontend_path}/src/{page_name}.html'):
-        return render_template(f'src/{page_name}.html')
-    else:
-        return abort(404)
-
+# ----------------- API ROUTES (unchanged) -----------------
 
 @app.route('/api/login', methods=['POST'])
 def is_valid_user():
@@ -96,11 +70,13 @@ def register_user():
         "status": False,
         "text": ""
     }
-    print(type(user_id))
-    response["status"] = db_handler.insert_user(user_id, firstName, lastName, email, password, gender, birth_date,
-                                                phone_number, address, 5000)
 
-    if response["status"] == False:
+    response["status"] = db_handler.insert_user(
+        user_id, firstName, lastName, email, password,
+        gender, birth_date, phone_number, address, 5000
+    )
+
+    if not response["status"]:
         response["text"] = "There already a registered user wth this user id"
 
     return json.dumps(response)
@@ -108,9 +84,6 @@ def register_user():
 
 @app.route('/api/withdraw', methods=['POST'])
 def handle_withdraw():
-    global users
-    global transactions
-
     data = request.json
     user_id = data.get('user_id')
     amount = data.get('amount')
@@ -122,6 +95,7 @@ def handle_withdraw():
         "balance": 0,
         "transactions": []
     }
+
     result = db_handler.get_user_balance(user_id)
 
     if result is None:
@@ -129,15 +103,15 @@ def handle_withdraw():
     elif amount > result:
         response["text"] = f"There isn't enough money in the account. You only have {result}"
     else:
-        db_handler.insert_transaction(user_id, "Withdrawal", datetime.now().strftime("%d/%m/%y %H:%M:%S"), description, amount)
-
+        db_handler.insert_transaction(
+            user_id, "Withdrawal",
+            datetime.now().strftime("%d/%m/%y %H:%M:%S"), description, amount
+        )
         db_handler.update_balance(user_id, result - amount)
 
         response["status"] = True
         response["balance"] = result - amount
-
         response["transactions"] = db_handler.get_user_last_transactions(user_id)
-
 
     return json.dumps(response)
 
@@ -161,7 +135,6 @@ def get_user_data():
     else:
         response["status"] = True
         response["balance"] = result
-
         response["transactions"] = db_handler.get_user_last_transactions(user_id)
 
     return json.dumps(response)
@@ -169,13 +142,9 @@ def get_user_data():
 
 @app.route('/api/transfer', methods=['POST'])
 def handle_transfer():
-    global users
-    global transactions
-
     data = request.json
     from_id = data.get("from_id")
     to_id = data.get("to_id")
-    person_name = data.get("person_name")
     amount = float(data.get('amount'))
     description = data.get("description")
 
@@ -184,28 +153,32 @@ def handle_transfer():
         "text": "",
     }
 
-    resul1 = db_handler.get_user_balance(from_id)
-    resul2 = db_handler.get_user_balance(to_id)
+    result1 = db_handler.get_user_balance(from_id)
+    result2 = db_handler.get_user_balance(to_id)
 
-    if resul1 is None or resul2 is None:
+    if result1 is None or result2 is None:
         response["text"] = "There isn't a registered user wth the user ids"
-    # elif f'{users[to_id]["first_name"]} {users[to_id]["last_name"]}' != person_name:
-    #     response["text"] = "The person name is not correct"
     elif from_id == to_id:
         response["text"] = "You cannot transfer to yourself"
-    elif amount > resul1:
-        response["text"] = f"There isn't enough money in the account. You only have {resul1}"
+    elif amount > result1:
+        response["text"] = f"There isn't enough money in the account. You only have {result1}"
     else:
-        db_handler.insert_transaction(from_id, "Transfer", datetime.now().strftime("%d/%m/%y %H:%M:%S"), description,
-                                      amount)
-        db_handler.insert_transaction(to_id, "Transfer", datetime.now().strftime("%d/%m/%y %H:%M:%S"), description,
-                                      amount)
+        db_handler.insert_transaction(
+            from_id, "Transfer",
+            datetime.now().strftime("%d/%m/%y %H:%M:%S"), description, amount
+        )
+        db_handler.insert_transaction(
+            to_id, "Transfer",
+            datetime.now().strftime("%d/%m/%y %H:%M:%S"), description, amount
+        )
 
-        db_handler.update_balance(from_id, resul1 - amount)
-        db_handler.update_balance(to_id, resul2 + amount)
+        db_handler.update_balance(from_id, result1 - amount)
+        db_handler.update_balance(to_id, result2 + amount)
+
         response["status"] = True
 
     return json.dumps(response)
 
 
-app.run(debug=True)
+app.run(host="0.0.0.0", port=5000, debug=True)
+

@@ -2,7 +2,8 @@
 <html>
     <head>
         <title>Login Page</title>
-        <link rel="stylesheet" href="../style/styles.css">
+        <link rel="stylesheet" href="/static/styles.css">
+
         <script>
             function validateLogin()
             {
@@ -94,7 +95,7 @@
                 if(result == false)
                     return false;
 
-                window.location.href = "/page/account"
+                window.location.href = "/src/account.html"
             }
         </script>
     </head>
@@ -112,7 +113,7 @@
             <button type="button" onclick="SubmitLogin()">Login</button>
             <br/>
             <br/>
-            <a href="/page/register">Press here to register a new user</a>
+            <a href="/src/register.html">Press here to register a new user</a>
         </form>
     </body>
 </html>

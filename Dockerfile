@@ -1,22 +1,23 @@
-# Use official Python base image
 FROM python:3.11-slim
+
+# Install system dependencies needed for SQLite
+RUN apt-get update && apt-get install -y libsqlite3-dev && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip
+RUN pip install --upgrade pip
 
 # Set working directory
 WORKDIR /app
 
-# Copy backend and frontend into the container
-COPY backend/ ./backend
-COPY frontend/ ./frontend
+# Copy the app code
+COPY backend/ backend/
+COPY frontend/ frontend/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
-# Set environment variables for Flask
-ENV FLASK_APP=backend/app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
-# Expose port
+# Expose Flask port
 EXPOSE 5000
 
-# Run the app
-CMD ["flask", "run"]
+# Start the app
+CMD ["python", "backend/app.py"]

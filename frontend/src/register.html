@@ -2,7 +2,8 @@
 <html>
     <head>
         <title>Register Page</title>
-        <link rel="stylesheet" href="../style/styles.css">
+        <link rel="stylesheet" href="/static/styles.css">
+
         <script>
             function validateRegister() {
                 id = document.getElementsByTagName("input")[0].value;
@@ -105,7 +106,7 @@
                 if(result == false)
                     return false;
                 else
-                    window.location.href = "/page/account";
+                    window.location.href = "/src/account.html";
             }
         </script>
     </head>
@@ -146,7 +147,7 @@
             <input type="text" placeholder="Please enter your address" />
             
             <button type="button" onclick="SubmitRegister()">Register</button>
-            <a href="/page/login">Back to login</a>
+            <a href="/src/login.html">Back to login</a>
         </form>
     </body>    
 </html>

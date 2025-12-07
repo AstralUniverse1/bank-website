@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Transfer Money</title>
-    <link rel="stylesheet" href="../style/styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
     <script>
         function validate_fields()
         {
@@ -29,7 +29,7 @@
 
             return true;
 
-            window.location.href = "/page/confirmation";
+            window.location.href = "/src/confirmation.html";
         }
         async function CheckTransferInfo()
         {
@@ -72,7 +72,7 @@
                 if(result == false)
                     return false;
 
-                window.location.href = "/page/confirmation";
+                window.location.href = "/src/confirmation.html";
             }
     </script>
 </head>
@@ -95,7 +95,7 @@
 
         <button type="button" onclick="SubmitTransfer()">Transfer</button>
 
-        <a href="/page/account">Back to Account</a>
+        <a href="/src/account.html">Back to Account</a>
     </form>
 </body>
 </html>
