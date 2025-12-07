@@ -17,6 +17,3 @@ The application is containerized using Docker. To run locally:
    docker run -p 5000:5000 bank-app
 
 3. Open your browser at http://127.0.0.1:5000
-
-- SQLite database persists in the container or mounted volume.
-- Frontend is served by Flask from the frontend/ folder.
