@@ -17,6 +17,8 @@ dist/
 
 .idea/
 
+terraform/.terraform/
+
 TEST*.xml
 
 .DS_Store
