@@ -1,8 +1,13 @@
 node_modules/
 dist/
 backend/venv/
+.cache/
 
 .env
+docker-compose.override.yml
+.env.local
+.env.*.local
+
 
 *.class
 
@@ -18,6 +23,9 @@ dist/
 .idea/
 
 terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform.lock.hcl
 
 TEST*.xml
 
@@ -35,4 +43,31 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+
+kubeconfig
+*.kube
+
+charts/**/charts/
+charts/**/tmp/
+charts/**/.helmignore
+*.tgz
+
+manifests/
+
+__pycache__/
+*.pyo
+*.pyd
+.env/
+.envrc
+.venv/
+
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+
+.vscode/
+*.swp
+*.swo
+
 
