@@ -8,11 +8,17 @@ A simple banking web app with:
 - Terraform for provisioning an AWS EC2 instance (ap-northeast-1)
 
 Project structure:
+
 backend/        – Flask app + local SQLite DB
+
 frontend/       – Static UI
+
 Terraform/      – EC2 instance + security group
+
 .github/workflows/ci.yml         # CI pipeline (lint, build, scan, push)
+
 .github/workflows/terraform.yml  # Terraform pipeline (init + apply)
+
 Dockerfile      – Builds and runs the application
 
 Run locally with Docker:
