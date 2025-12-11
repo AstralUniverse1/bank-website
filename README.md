@@ -9,14 +9,10 @@ A simple banking web app with:
 
 Project structure:
 backend/        – Flask app + local SQLite DB
-
 frontend/       – Static UI
-
 Terraform/      – EC2 instance + security group
-
 .github/workflows/ci.yml         # CI pipeline (lint, build, scan, push)
 .github/workflows/terraform.yml  # Terraform pipeline (init + apply)
-
 Dockerfile      – Builds and runs the application
 
 Run locally with Docker:
@@ -33,8 +29,4 @@ CI pipeline (ci.yml) does:
 
 Terraform pipeline (terraform.yml) does:
 - terraform init
-- terraform apply -auto-approve
-(workflow manual trigger only for Terraform)
-
-Tech stack:
-Python/Flask, HTML/CSS/JS, Docker, GitHub Actions, Terraform, SQLite
+- terraform apply -auto-approve (manual workflow run)
