@@ -13,7 +13,7 @@ backend/        – Flask app + local SQLite DB
 
 frontend/       – Static UI
 
-Terraform/      – EC2 instance + security group
+Terraform/      – EC2 instance (ap-northeast-1)
 
 .github/workflows/ci.yml         # CI pipeline (lint, build, scan, push)
 
