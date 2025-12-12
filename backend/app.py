@@ -5,6 +5,7 @@ import json
 
 import db_handler
 
+
 # FRONTEND ROOT
 FRONTEND_ROOT = '/app/frontend'
 
@@ -180,5 +181,5 @@ def handle_transfer():
     return json.dumps(response)
 
 
-app.run(host="0.0.0.0", port=5000, debug=True)
+app.run(host="0.0.0.0", port=5000, debug=False)
 

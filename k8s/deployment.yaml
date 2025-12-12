@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank-app
+  template:
+    metadata:
+      labels:
+        app: bank-app
+    spec:
+      containers:
+        - name: bank-app
+          image: astraluniverse/bank-app:latest
+          ports:
+            - containerPort: 5000

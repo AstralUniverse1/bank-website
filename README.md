@@ -15,6 +15,8 @@ frontend/       – Static UI
 
 Terraform/      – EC2 instance (ap-northeast-1)
 
+k8s/            - Deployment with NodePort
+
 .github/workflows/ci.yml         # CI pipeline (lint, build, scan, push)
 
 .github/workflows/terraform.yml  # Terraform pipeline (init + apply)
@@ -25,6 +27,11 @@ Run locally with Docker:
 1) docker build -t bank-app .
 2) docker run -p 5000:5000 bank-app
 3) Open http://127.0.0.1:5000
+
+Kubernetes
+1) kubectl apply -f k8s/
+2) (Once pod is running) kubectl get svc bank-app
+3) Open http://<NODE_IP>:<NODEPORT>
 
 CI pipeline (ci.yml) does:
 - Lints Dockerfile (hadolint)
