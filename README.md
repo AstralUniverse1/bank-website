@@ -1,4 +1,4 @@
-# Bank Website – Flask, Docker, Terraform, GitHub Actions
+# Bank Website – Flask, Docker, Terraform, GitHub Actions, Kubernetes
 
 A simple banking web app with:
 - Flask backend (SQLite)
@@ -7,7 +7,7 @@ A simple banking web app with:
 - GitHub Actions for CI and Terraform automation
 - Terraform for provisioning an AWS EC2 instance (ap-northeast-1)
 
-Project structure:
+File system:
 
 backend/        – Flask app + local SQLite DB
 
@@ -17,9 +17,9 @@ Terraform/      – EC2 instance (ap-northeast-1)
 
 k8s/            - Deployment with NodePort
 
-.github/workflows/ci.yml         # CI pipeline (lint, build, scan, push)
+.github/workflows/ci.yml         - CI pipeline (lint, build, scan, push)
 
-.github/workflows/terraform.yml  # Terraform pipeline (init + apply)
+.github/workflows/terraform.yml  - Terraform pipeline (init + apply)
 
 Dockerfile      – Builds and runs the application
 
@@ -33,13 +33,13 @@ Kubernetes
 2) (Once pod is running) kubectl get svc bank-app
 3) Open http://<NODE_IP>:<NODEPORT>
 
-CI pipeline (ci.yml) does:
+CI pipeline (ci.yml):
 - Lints Dockerfile (hadolint)
 - Builds Docker image
 - Scans the image with Trivy
 - Runs a simple smoke test (container starts and logs checked)
 - Pushes image to DockerHub (latest + commit SHA tag)
 
-Terraform pipeline (terraform.yml) does:
-- terraform init
-- terraform apply -auto-approve (manual workflow run. emphemeral state - destroy manually in console)
+Terraform pipeline (terraform.yml):
+1) terraform init
+2) terraform apply -auto-approve (manual workflow run. emphemeral state - destroy manually in console)
