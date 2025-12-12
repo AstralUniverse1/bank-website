@@ -35,4 +35,4 @@ CI pipeline (ci.yml) does:
 
 Terraform pipeline (terraform.yml) does:
 - terraform init
-- terraform apply -auto-approve (manual workflow run)
+- terraform apply -auto-approve (manual workflow run. emphemeral state - destroy manually in console)
