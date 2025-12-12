@@ -55,7 +55,7 @@ resource "aws_instance" "app" {
   instance_type = "t3.micro"
 
   security_groups = [
-    aws_security_group.ssh.name
+    aws_security_group.ssh_http.name
   ]
 
   tags = {
