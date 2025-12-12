@@ -4,6 +4,7 @@ A simple banking web app with:
 - Flask backend (SQLite)
 - HTML/CSS/JS frontend
 - Docker containerization
+- Kubernetes deployment
 - GitHub Actions for CI and Terraform automation
 - Terraform for provisioning an AWS EC2 instance (ap-northeast-1)
 
