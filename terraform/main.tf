@@ -23,7 +23,7 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_security_group" "ssh/http" {
+resource "aws_security_group" "ssh_http" {
   name        = "allow-ssh"
   description = "Allow SSH access"
   vpc_id      = data.aws_vpc.default.id
