@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: bank-app
 spec:
-  replicas: 1
+  replicas: 1  # must be 1 for sqlite db
   selector:
     matchLabels:
       app: bank-app
