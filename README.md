@@ -20,18 +20,7 @@ Docker → CI → Terraform → Kubernetes → Helm → ArgoCD → Ansible.
 * Helm chart: `helm/bank-app`
 * ArgoCD manages deployment from `dev`
 * App manifest: `argocd/bank-app.yaml`
-## Repository Structure
-```
-backend/        Flask app + SQLite
-frontend/       HTML / CSS / JS
-Dockerfile      App container
-.github/        CI workflows
-terraform/      EC2 infrastructure
-k8s/            Raw Kubernetes manifests
-helm/           Helm chart
-argocd/         ArgoCD app manifest
-ansible/        EC2 configuration
-```
+
 ## Limitations
 * SQLite limits replicas to 1
 * No persistent volume
