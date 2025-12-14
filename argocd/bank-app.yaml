@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bank-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AstralUniverse1/bank-website.git
+    targetRevision: dev
+    path: helm/bank-app
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    manual: {}
