@@ -6,7 +6,6 @@ data "aws_vpc" "default" {
   default = true
 }
 
-# Get latest Ubuntu 22.04 AMI (official Canonical)
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -24,8 +23,8 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "ssh_http" {
-  name        = "allow-ssh"
-  description = "Allow SSH access"
+  name        = "allow-ssh-http"
+  description = "Allow SSH and http inbound"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
