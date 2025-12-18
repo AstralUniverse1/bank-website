@@ -14,13 +14,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Debug paths
-        run: |
-          pwd
-          ls
-          ls bank_website
-          ls bank_website/backend
-
       - name: Install Snyk
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -37,7 +30,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         if: env.SNYK_TOKEN != ''
-        working-directory: bank_website/backend
+        working-directory: backend
         run: snyk test
 
       - name: Lint Dockerfile
