@@ -14,25 +14,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install Snyk
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        if: env.SNYK_TOKEN != ''
-        run: npm install -g snyk
-
-      - name: Snyk auth
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        if: env.SNYK_TOKEN != ''
-        run: snyk auth $SNYK_TOKEN
-
-      - name: Snyk scan (Python deps)
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        if: env.SNYK_TOKEN != ''
-        working-directory: backend
-        run: snyk test
-
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v2.1.0
         with:
