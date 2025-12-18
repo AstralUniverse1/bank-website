@@ -5,7 +5,7 @@ WORKDIR /app
 COPY backend/ backend/
 COPY frontend/ frontend/
 
-RUN python -m pip install --upgrade pip \
+RUN python -m pip install --upgrade --no-cache-dir pip \
     && pip install --no-cache-dir -r backend/requirements.txt
 
 EXPOSE 5000
