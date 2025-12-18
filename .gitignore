@@ -7,7 +7,15 @@ backend/venv/
 docker-compose.override.yml
 .env.local
 .env.*.local
+.env.docker
 
+.kubeconfig*
+
+.aws/
+
+*.pem
+id_rsa*
+id_ed25519*
 
 *.class
 

@@ -14,6 +14,16 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Install Snyk
+        run: npm install -g snyk
+      
+      - name: Snyk auth
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Snyk scan (Python deps)
+        working-directory: bank_website/backend
+        run: snyk test
+
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v2.1.0
         with:

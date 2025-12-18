@@ -1,0 +1,5 @@
+version: v1.25.0
+ignore:
+  SNYK-PYTHON-SOMEPACKAGE-123456:
+    - reason: false positive for demo project
+      expires: 2026-01-01
