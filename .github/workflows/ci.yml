@@ -15,15 +15,21 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Snyk
-        if: ${{ secrets.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        if: env.SNYK_TOKEN != ''
         run: npm install -g snyk
 
       - name: Snyk auth
-        if: ${{ secrets.SNYK_TOKEN != '' }}
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        if: env.SNYK_TOKEN != ''
+        run: snyk auth $SNYK_TOKEN
 
       - name: Snyk scan (Python deps)
-        if: ${{ secrets.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        if: env.SNYK_TOKEN != ''
         working-directory: bank_website/backend
         run: snyk test
 
