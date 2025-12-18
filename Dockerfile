@@ -11,3 +11,8 @@ EXPOSE 5000
 
 CMD ["python", "backend/app.py"]
 
+
+# build: docker build -t bank-app .
+# run: docker run -p 5000:5000 bank-app
+# run persistent: docker compose -f docker-compose.sqlite.yml up -d
+# remove volume later: docker compose -f docker-compose.sqlite.yml down -v

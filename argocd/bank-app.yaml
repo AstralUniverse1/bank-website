@@ -17,3 +17,14 @@ spec:
     namespace: default
   syncPolicy:
     manual: {}
+
+# to run: kubectl apply -f argocd/bank-app.yaml
+# check application status: kubectl get applications -n argocd
+#
+# Start ArgoCD UI (port-forward)
+# kubectl port-forward svc/argocd-server -n argocd 8080:443
+# kubectl get secret argocd-initial-admin-secret -n argocd \
+#   -o jsonpath="{.data.password}" | base64 -d
+
+# Open UI: https://localhost:8080
+# Username: admin

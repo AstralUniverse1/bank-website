@@ -16,3 +16,14 @@
         name: docker
         state: started
         enabled: yes
+    
+    - name: Install docker-compose plugin
+      apt:
+        name: docker-compose-plugin
+        state: present
+        update_cache: yes
+
+
+
+# to run:
+# ansible-playbook -i "1.2.3.4," playbook.yml -u ubuntu --private-key ~/.ssh/key.pem

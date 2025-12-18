@@ -17,3 +17,9 @@ spec:
           image: astraluniverse/bank-app:latest
           ports:
             - containerPort: 5000
+
+# install/upgrade: kubectl apply -f k8s/stateless/deployment.yaml
+# uninstall: kubectl delete -f k8s/stateless/deployment.yaml
+# check pods: kubectl get pods
+# get node port: kubectl get svc bank-app
+# access app: http://<NodeIP>:<NodePort>

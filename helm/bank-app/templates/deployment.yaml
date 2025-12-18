@@ -17,3 +17,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: 5000
+
+# install: helm install bank-app ./helm/bank-app
+# upgrade: helm upgrade bank-app ./helm/bank-app
+# uninstall: helm uninstall bank-app
+# check pod: kubectl get pods
+# get node port: kubectl get svc bank-app
+# access app: http://<NodeIP>:<NodePort>

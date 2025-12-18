@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  app:
+    image: astraluniverse/bank-app:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - db-data:/app/backend/
+
+volumes:
+  db-data:
+
+# run: docker compose -f docker-compose.sqlite.yml up -d
+# remove volume later: docker compose -f docker-compose.sqlite.yml down -v

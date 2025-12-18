@@ -6,6 +6,7 @@ Docker → CI → Terraform → Kubernetes → Helm → ArgoCD → Ansible.
 * SQLite database (single-replica)
 * HTML/CSS/JS frontend
 * Runs on port 5000
+* Optional Docker Compose setup provided for local persistent SQLite using a Docker volume
 ## CI/CD
 * GitHub Actions
 * Linting, Trivy scan, smoke test
@@ -20,7 +21,3 @@ Docker → CI → Terraform → Kubernetes → Helm → ArgoCD → Ansible.
 * Helm chart: `helm/bank-app`
 * ArgoCD manages deployment from `dev`
 * App manifest: `argocd/bank-app.yaml`
-
-## Limitations
-* SQLite limits replicas to 1
-* No persistent volume
