@@ -26,4 +26,4 @@
 
 
 # to run:
-# ansible-playbook -i "1.2.3.4," playbook.yml -u ubuntu --private-key ~/.ssh/key.pem
+# ansible-playbook -i inventory.ini playbook.yml
