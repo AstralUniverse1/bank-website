@@ -1,23 +1,17 @@
-# Bank Website Demo
-Demo banking web application used to showcase a **complete DevOps pipeline**:
-Docker → CI → Terraform → Kubernetes → Helm → ArgoCD → Ansible.
-## Application
-* Flask backend
-* SQLite database (single-replica)
-* HTML/CSS/JS frontend
-* Runs on port 5000
-* Optional Docker Compose setup provided for local persistent SQLite using a Docker volume
+# DevOps Project
+Demo banking web app used to showcase Docker, CI/CD and Terraform
+Runs on port 5000
+Flask backend, HTML/CSS/JS frontend, SQLite database (single-replica)
+Includes docker compose setup with persistent volume
 ## CI/CD
-* GitHub Actions
-* Linting, Trivy scan, smoke test
-* Docker image build & push
-* Terraform workflow (manual trigger)
+* GitHub Actions (needs DOCKER_USERNAME, DOCKER_PASSWORD, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+* CI workflow: lint, build, trivy, test, docker push (doesnt touch infra)
+* Terraform workflow (manual trigger only)
 ## Infrastructure
-* Terraform provisions EC2
-* Ansible configures EC2 (Docker install)
+* Terraform provisions EC2 and SG (keypair and ssh_cidr inputs on apply - recommended)
+* Ansible configures EC2 (docker and docker compose install only, no app deployment)
 ## Kubernetes & GitOps
 * Stateless Kubernetes deployment
 * NodePort service
-* Helm chart: `helm/bank-app`
-* ArgoCD manages deployment from `dev`
-* App manifest: `argocd/bank-app.yaml`
+* Helm chart
+* ArgoCD
