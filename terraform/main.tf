@@ -31,14 +31,14 @@ resource "aws_security_group" "ssh_http" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP from anywhere
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere (demo purpose only)
   }
 
   egress {
@@ -49,10 +49,15 @@ resource "aws_security_group" "ssh_http" {
   }
 }
 
+variable "key_name" {
+  description = "Existing EC2 key pair name"
+  type        = string
+}
+
 resource "aws_instance" "app" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
-
+  key_name = var.key_name
   security_groups = [
     aws_security_group.ssh_http.name
   ]
@@ -61,3 +66,5 @@ resource "aws_instance" "app" {
     Name = "flask-app"
   }
 }
+# To apply keypaired:
+# terraform apply -var="key_name=<YOUR_KEY_PAIR_NAME>"

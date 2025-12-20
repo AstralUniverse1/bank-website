@@ -9,3 +9,5 @@ spec:
   ports:
     - port: 80
       targetPort: 5000
+
+# production would use LoadBalancer/Ingress instead of NodePort
