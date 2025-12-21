@@ -11,7 +11,10 @@ Includes docker compose setup with persistent volume
 * Terraform provisions EC2 and SG (keypair and ssh_cidr inputs on apply - recommended)
 * Ansible configures EC2 (docker and docker compose install only, no app deployment)
 ## Kubernetes & GitOps
+* Deploys to the cluster selected by the active kubectl context
 * Stateless Kubernetes deployment
 * NodePort service
 * Helm chart
 * ArgoCD
+
+

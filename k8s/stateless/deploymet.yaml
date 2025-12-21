@@ -1,3 +1,8 @@
+# deploys to the active kubectl context.
+# check current cluster: kubectl config current-context
+# list available clusters/contexts: kubectl config get-contexts
+# switch context: kubectl config use-context <context-name>
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
