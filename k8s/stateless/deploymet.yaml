@@ -1,7 +1,8 @@
-# deploys to the active kubectl context.
-# check current cluster: kubectl config current-context
-# list available clusters/contexts: kubectl config get-contexts
+# deploys to the cluster selected by the active kubectl context
+# check current context: kubectl config current-context
+# list available contexts: kubectl config get-contexts
 # switch context: kubectl config use-context <context-name>
+# EKS example: aws eks update-kubeconfig --name <cluster-name> --region <region>
 
 apiVersion: apps/v1
 kind: Deployment
