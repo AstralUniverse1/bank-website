@@ -15,8 +15,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: default
-  syncPolicy:
-    manual: {}
+  syncPolicy: {}
 
 # to run: kubectl apply -f argocd/bank-app.yaml
 # check application status: kubectl get applications -n argocd
