@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: bank-app
+  repository: astraluniverse/bank-app
   tag: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   nodePort: 32172
