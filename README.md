@@ -3,7 +3,7 @@
 * Flask backend (on port 5000), HTML/CSS/JS frontend, SQLite database (single-replica)
 * Includes docker compose setup with persistent volume
 ## CI/CD
-* GitHub Actions (needs DOCKER_USERNAME, DOCKER_PASSWORD, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+* GitHub Actions (requires repo/fork Actions secrets: DOCKER_USERNAME, DOCKER_PASSWORD (or  DOCKER_TOKEN), AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 * CI workflow: lint, build, trivy, test, docker push (doesnt touch infra)
 * Terraform workflow (manual trigger only)
 ## Infrastructure
@@ -13,8 +13,5 @@
 * Deploys to the cluster selected by the active kubectl context
 * Stateless Kubernetes deployment
 * NodePort service
-* Helm chart
+* Helm: Stateful MySQL (StatefulSet + PVC; requires a default StorageClass)
 * ArgoCD
-
-
-# Project_Main
