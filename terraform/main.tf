@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "ap-northeast-1"
+  region = "eu-north-1" # example region
 }
 
 data "aws_vpc" "default" {
