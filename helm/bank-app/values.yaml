@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: astraluniverse/bank-app
+  repository: astraluniverse/bank-app-cd
   tag: "latest"
   pullPolicy: Always
 
