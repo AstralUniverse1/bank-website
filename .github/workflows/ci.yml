@@ -54,7 +54,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/bank-app:latest
-            ${{ secrets.DOCKER_USERNAME }}/bank-app:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/bank-app-cd:latest
+            ${{ secrets.DOCKER_USERNAME }}/bank-app-cd:${{ github.sha }}
 
 

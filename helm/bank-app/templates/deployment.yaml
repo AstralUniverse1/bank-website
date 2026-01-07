@@ -1,26 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bank-app
+  name: {{ include "bank-app-cd.fullname" . }}
 spec:
-  replicas: {{ .Values.replicaCount }}  # must be 1 for sqlite db
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: bank-app
+      app: {{ include "bank-app-cd.name" . }}
   template:
     metadata:
       labels:
-        app: bank-app
+        app: {{ include "bank-app-cd.name" . }}
     spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command: ["sh","-c","until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done"]
       containers:
-        - name: bank-app
+        - name: {{ include "bank-app-cd.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 5000
-
-# install: helm install bank-app ./helm/bank-app
-# upgrade: helm upgrade bank-app ./helm/bank-app
-# uninstall: helm uninstall bank-app
-# check pod: kubectl get pods
-# get node port: kubectl get svc bank-app
-# access app: http://<NodeIP>:<NodePort>
+          env:
+            - name: MYSQL_HOST
+              value: mysql
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bank-app-cd.fullname" . }}-mysql
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bank-app-cd.fullname" . }}-mysql
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bank-app-cd.fullname" . }}-mysql
+                  key: MYSQL_PASSWORD

@@ -1,5 +1,20 @@
 replicaCount: 1
 
 image:
-  repository: astraluniverse/bank-app
-  tag: latest
+  repository: bank-app
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  nodePort: 32172
+
+mysql:
+  enabled: true
+  image: "mysql:8.0"
+  database: bank
+  user: bankuser
+  password: bankpass
+  rootPassword: rootpass
+  storage:
+    size: 2Gi
+    storageClassName: ""   # leave empty to use cluster default
