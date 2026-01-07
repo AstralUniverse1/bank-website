@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/AstralUniverse1/bank-website.git
-    targetRevision: dev
+    targetRevision: main
     path: helm/bank-app
     helm:
       valueFiles:
