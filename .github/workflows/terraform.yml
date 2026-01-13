@@ -41,4 +41,4 @@ jobs:
 
       - name: Terraform Apply (auto-approve)
         working-directory: terraform
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false -var="key_name=${{ vars.TF_VAR_key_name }}"
