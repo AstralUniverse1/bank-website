@@ -2,9 +2,10 @@ terraform {
   backend "s3" {}
 }
 
-provider "aws" {
-  region = "eu-north-1" # example region
-}
+variable "aws_region" { type = string }
+variable "ssh_cidr" { type = string }
+
+provider "aws" { region = var.aws_region }
 
 data "aws_vpc" "default" {
   default = true
@@ -42,7 +43,7 @@ resource "aws_security_group" "ssh_http" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere (demo purpose only)
+    cidr_blocks = [var.ssh_cidr]
   }
 
   egress {
@@ -62,9 +63,7 @@ resource "aws_instance" "app" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
   key_name = var.key_name
-  security_groups = [
-    aws_security_group.ssh_http.name
-  ]
+  vpc_security_group_ids = [aws_security_group.ssh_http.id]
 
   tags = {
     Name = "flask-app"
