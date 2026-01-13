@@ -70,5 +70,3 @@ resource "aws_instance" "app" {
     Name = "flask-app"
   }
 }
-# To apply keypaired:
-# terraform apply -var="key_name=<YOUR_KEY_PAIR_NAME>"
