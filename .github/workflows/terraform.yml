@@ -6,6 +6,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+     TF_VAR_key_name: ${{ vars.TF_VAR_key_name }}
+     TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+     TF_VAR_ssh_cidr: ${{ secrets.TF_VAR_ssh_cidr }}
 
     steps:
       - uses: actions/checkout@v4
@@ -41,4 +45,4 @@ jobs:
 
       - name: Terraform Apply (auto-approve)
         working-directory: terraform
-        run: terraform apply -auto-approve -input=false -var="key_name=${{ vars.TF_VAR_key_name }}"
+        run: terraform apply -auto-approve -input=false
