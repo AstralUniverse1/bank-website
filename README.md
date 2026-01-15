@@ -6,8 +6,9 @@
 * GitHub Actions (requires repo/fork Actions secrets: DOCKER_USERNAME, DOCKER_PASSWORD)
 * CI workflow: lint, build, trivy, test, docker push
 ## Infrastructure
-* Terraform workflow creates remote state in AWS S3 bucket + DynamoDB
-* Requirements: AWS_REGION, TF_LOCK_TABLE, TF_STATE_BUCKET, TF_VAR_key_name, TF_VAR_ssh_cidr, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+* Terraform workflow uses a pre-required remote backend (S3 + DynamoDB) for state
+* Backend configuration is derived from GitHub secrets and variables  
+  (see `workflows/terraform.yml`)
 * Provisions EC2 + SG (port 22 and 80 inbound)
 * Ansible configures EC2 (docker + compose install only)
 ## Kubernetes & GitOps
