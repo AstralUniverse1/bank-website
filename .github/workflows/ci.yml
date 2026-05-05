@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_REPO: astraluniverse/bank-app
 
     steps:
 
@@ -24,6 +26,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set image tags
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
 
       - name: Build docker image
         uses: docker/build-push-action@v5
@@ -54,7 +59,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/bank-app-cd:latest
-            ${{ secrets.DOCKER_USERNAME }}/bank-app-cd:${{ github.sha }}
-
+            ${{ env.IMAGE_REPO }}:latest
+            ${{ env.IMAGE_REPO }}:${{ github.sha }}
+            ${{ env.IMAGE_REPO }}:${{ env.SHORT_SHA }}
 

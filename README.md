@@ -1,19 +1,51 @@
-# DevOps Project
-* Demo banking web app used to showcase Docker, CI/CD and Terraform
-* Flask backend (on port 5000), HTML/CSS/JS frontend, SQLite database (single-replica)
-* Includes docker compose setup with persistent volume
-## CI/CD
-* GitHub Actions (requires repo/fork Actions secrets: DOCKER_USERNAME, DOCKER_PASSWORD)
-* CI workflow: lint, build, trivy, test, docker push
-## Infrastructure
-* Terraform workflow uses a pre-required remote backend (S3 + DynamoDB) for state
-* Backend configuration is derived from GitHub secrets and variables  
-  (see `workflows/terraform.yml`)
-* Provisions EC2 + SG (port 22 and 80 inbound)
-* Ansible configures EC2 (docker + compose install only)
-## Kubernetes & GitOps
-* Deploys to the cluster selected by the active kubectl context
-* Stateless Kubernetes deployment
-* NodePort service
-* Helm: Stateful MySQL (StatefulSet + PVC; requires a default StorageClass)
-* ArgoCD
+# Bank Website
+
+Demo banking web app used to showcase application containerization, CI, Docker image publishing, and a small EC2 remote-state workflow.
+
+## Application
+
+- Flask backend on port 5000.
+- HTML/CSS/JS frontend served by Flask.
+- SQLite is used by default for local/demo runs.
+- MySQL is used when `MYSQL_HOST` is defined.
+- The SQLite database file is generated on demand and is not tracked in Git.
+
+## CI
+
+GitHub Actions builds and validates the Docker image on `main` pushes and manual runs:
+
+- Lints the Dockerfile with Hadolint.
+- Builds the image.
+- Scans the image with Trivy.
+- Runs a simple container smoke test.
+- Pushes `astraluniverse/bank-app` with `latest`, full commit SHA, and short SHA tags.
+
+## Local Docker Run
+
+```bash
+docker build -t bank-app .
+docker run -p 5000:5000 bank-app
+```
+
+For a persistent local SQLite volume:
+
+```bash
+docker compose -f docker-compose.sqlite.yml up -d
+docker compose -f docker-compose.sqlite.yml down -v
+```
+
+## Optional EC2 Workflow
+
+The Terraform workflow demonstrates remote state with an S3 backend and DynamoDB lock table. It provisions a small EC2 host and security group.
+
+The Ansible playbook configures that EC2 host with Docker and the Docker Compose plugin.
+
+Required GitHub configuration is documented in `.github/workflows/terraform.yml`.
+
+## GitOps Deployment
+
+Kubernetes deployment is managed in the companion GitOps repo:
+
+https://github.com/AstralUniverse1/bank-gitops
+
+That repo owns the Helm chart, ArgoCD Application, and manual image promotion workflow.
