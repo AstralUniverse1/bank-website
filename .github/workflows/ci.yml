@@ -30,6 +30,18 @@ jobs:
       - name: Set image tags
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
 
+      - name: Show image tags
+        run: |
+          {
+            echo "Published image tags:"
+            echo "${IMAGE_REPO}:latest"
+            echo "${IMAGE_REPO}:${GITHUB_SHA}"
+            echo "${IMAGE_REPO}:${SHORT_SHA}"
+            echo
+            echo "Use this tag for GitOps promotion:"
+            echo "${SHORT_SHA}"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Build docker image
         uses: docker/build-push-action@v5
         with:
@@ -62,4 +74,3 @@ jobs:
             ${{ env.IMAGE_REPO }}:latest
             ${{ env.IMAGE_REPO }}:${{ github.sha }}
             ${{ env.IMAGE_REPO }}:${{ env.SHORT_SHA }}
-
