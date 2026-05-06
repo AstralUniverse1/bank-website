@@ -59,10 +59,19 @@ jobs:
 
       - name: Run smoke test
         run: |
-          docker run -d --name test bank-app:ci-temp
-          sleep 5
-          docker logs test || true
-          docker stop test || true
+          docker run -d --name bank-app-smoke -p 5000:5000 bank-app:ci-temp
+          trap 'docker logs bank-app-smoke || true; docker stop bank-app-smoke || true' EXIT
+
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:5000/ > /tmp/bank-app-smoke.html; then
+              grep -q "Login Page" /tmp/bank-app-smoke.html
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Smoke test failed: app did not serve the login page" >&2
+          exit 1
 
       - name: Push final image to DockerHub
         uses: docker/build-push-action@v5
