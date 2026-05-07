@@ -55,14 +55,6 @@ docker compose -f docker-compose.sqlite.yml up -d
 docker compose -f docker-compose.sqlite.yml down -v
 ```
 
-## Optional EC2 Workflow
-
-The Terraform workflow demonstrates remote state with an S3 backend and DynamoDB lock table. It provisions a small EC2 host and security group.
-
-The Ansible playbook configures that EC2 host with Docker and the Docker Compose plugin.
-
-Required GitHub configuration is documented in `.github/workflows/terraform.yml`.
-
 ## GitOps Deployment
 
 Kubernetes deployment is managed in the companion GitOps repo:
