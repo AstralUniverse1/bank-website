@@ -14,6 +14,18 @@ app = Flask(
     static_folder=os.path.join(FRONTEND_ROOT, "static")
 )
 
+@app.route('/healthz')
+def healthz():
+    return jsonify({"status": "ok"})
+
+@app.route('/readyz')
+def readyz():
+    try:
+        db_handler.ping_db()
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)}), 503
+    return jsonify({"status": "ok"})
+
 @app.route('/')
 def login_page():
     return render_template('src/login.html')
@@ -127,7 +139,6 @@ def handle_transfer():
 
     return jsonify({"status": True})
 
-app.run(host="0.0.0.0", port=5000, debug=False)
-
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "5000")), debug=False)
 

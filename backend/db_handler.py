@@ -44,14 +44,21 @@ def _wait_for_mysql(timeout_seconds=45):
     last_err = None
     while time.time() - start < timeout_seconds:
         try:
-            conn, cur = get_conn()
-            cur.execute("SELECT 1")
-            conn.close()
+            ping_db()
             return
         except Exception as e:
             last_err = e
             time.sleep(1)
     raise RuntimeError(f"MySQL not ready after {timeout_seconds}s: {last_err}")
+
+def ping_db():
+    conn, cursor = get_conn()
+    try:
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+    finally:
+        conn.close()
+    return True
 
 def init_db():
     if using_mysql():

@@ -63,7 +63,9 @@ jobs:
           trap 'docker logs bank-app-smoke || true; docker stop bank-app-smoke || true' EXIT
 
           for i in {1..20}; do
-            if curl -fsS http://127.0.0.1:5000/ > /tmp/bank-app-smoke.html; then
+            if curl -fsS http://127.0.0.1:5000/healthz \
+              && curl -fsS http://127.0.0.1:5000/readyz \
+              && curl -fsS http://127.0.0.1:5000/ > /tmp/bank-app-smoke.html; then
               grep -q "Login Page" /tmp/bank-app-smoke.html
               exit 0
             fi
