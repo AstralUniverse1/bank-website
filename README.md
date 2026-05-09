@@ -1,64 +1,36 @@
 # Bank Website
 
-Banking web app used to showcase a production-style Flask container, CI image validation, Docker image publishing, and GitOps deployment.
+Containerized demo banking app with GitHub Actions CI and DockerHub image publishing.
+
+This repo owns the application code, Docker image, and CI workflow. Kubernetes deployment is handled in the companion GitOps repo: [`bank-gitops`](https://github.com/AstralUniverse1/bank-gitops).
+
+## Repository Structure
+
+| Path | Purpose |
+| --- | --- |
+| `.github/workflows/ci.yml` | Build, scan, test, and publish Docker image |
+| `backend/` | Flask app, API routes, database handler, Python requirements |
+| `frontend/` | Static HTML/CSS/JS frontend |
+| `Dockerfile` | Python 3.11 image running Gunicorn as a non-root user |
+| `docker-compose.sqlite.yml` | Local run with persistent SQLite storage |
 
 ## Application
 
-- Flask backend served by Gunicorn on port 5000 in the Docker image.
-- HTML/CSS/JS frontend served by Flask.
-- SQLite is used by default for local/demo runs.
-- MySQL is used when `MYSQL_HOST` is defined.
-- The SQLite database file is generated on demand and is not tracked in Git.
-- Health endpoint: `GET /healthz`.
-- Readiness endpoint with database check: `GET /readyz`.
+| Area | Details |
+| --- | --- |
+| Runtime | Flask served by Gunicorn on port `5000` |
+| Frontend | Static files served by Flask |
+| Database | SQLite by default, generated untracked; MySQL when `MYSQL_HOST` is set or `DB_ENGINE=mysql` |
+| Health checks | `/healthz` and `/readyz` |
 
-Local development can still run the Flask entrypoint directly:
+## CI Workflow
 
-```bash
-python3 backend/app.py
-```
+The workflow runs on pushes to `main` and manual `workflow_dispatch` runs.
 
-The container runtime is the production path.
-
-## CI
-
-GitHub Actions builds and validates the Docker image on `main` pushes and manual runs:
-
-- Lints the Dockerfile with Hadolint.
-- Builds the image.
-- Scans the image with Trivy.
-- Runs a container smoke test for `/healthz`, `/readyz`, and the login page.
-- Pushes `astraluniverse/bank-app` with `latest`, full commit SHA, and short SHA tags.
-
-## Container Runtime
-
-The Docker image runs as a non-root user and starts Gunicorn with configurable defaults:
-
-- `PORT=5000`
-- `GUNICORN_WORKERS=2`
-- `GUNICORN_THREADS=4`
-- `GUNICORN_TIMEOUT=60`
-
-Local SQLite mode remains available in the container for quick validation, while Kubernetes deployments use MySQL through environment configuration.
-
-## Local Docker Run
-
-```bash
-docker build -t bank-app .
-docker run -p 5000:5000 bank-app
-```
-
-For a persistent local SQLite volume:
-
-```bash
-docker compose -f docker-compose.sqlite.yml up -d
-docker compose -f docker-compose.sqlite.yml down -v
-```
+It builds the Docker image, runs Hadolint, scans with Trivy, smoke-tests `/healthz`, `/readyz`, and login, and pushes `astraluniverse/bank-app` to DockerHub.
 
 ## GitOps Deployment
 
-Kubernetes deployment is managed in the companion GitOps repo:
+Deployment state lives in [`bank-gitops`](https://github.com/AstralUniverse1/bank-gitops).
 
-https://github.com/AstralUniverse1/bank-gitops
-
-That repo owns the Helm chart, ArgoCD Application, and manual image promotion workflow.
+The `bank-gitops` promotion workflow takes a manual `image_tag` input, updates the Helm chart image tag, and lets ArgoCD sync the change to Kubernetes.
