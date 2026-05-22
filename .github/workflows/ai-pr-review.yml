@@ -1,0 +1,63 @@
+name: AI PR Review
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      GITHUB_TOKEN: ${{ github.token }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PROJECT_CONTEXT: Demo Flask banking app with static frontend, SQLite/MySQL persistence, Docker image build, and GitOps deployment. Review for showcase-quality correctness, validation, auth, permission, workflow, and regression risks.
+      PR_SUMMARY: ${{ github.event.pull_request.title }}
+
+    steps:
+      - name: Checkout trusted reviewer code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+
+      - name: Fetch PR head for diff only
+        run: git fetch --no-tags origin "pull/${{ github.event.pull_request.number }}/head:refs/remotes/origin/pr-head"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install trusted reviewer dependencies
+        run: python -m pip install -r tools/ai-pr-reviewer/requirements.txt
+
+      - name: Validate workflow environment
+        run: |
+          test -n "$GITHUB_TOKEN" || { echo "::error::GITHUB_TOKEN is not available"; exit 1; }
+          test -n "$OPENAI_API_KEY" || { echo "::error::OPENAI_API_KEY secret is not available"; exit 1; }
+
+      - name: Validate sanitized review input
+        run: >-
+          python tools/ai-pr-reviewer/main.py
+          --github
+          --dry-run
+          --repo-path .
+          --project-context "$PROJECT_CONTEXT"
+          --pr-summary "$PR_SUMMARY"
+          >/tmp/ai-pr-review-input.json
+
+      - name: Run AI PR review
+        run: >-
+          python tools/ai-pr-reviewer/main.py
+          --github
+          --repo-path .
+          --project-context "$PROJECT_CONTEXT"
+          --pr-summary "$PR_SUMMARY"
