@@ -7,6 +7,46 @@ DB_PATH = os.environ.get(
     os.path.join(os.path.dirname(__file__), "bank_website.db")
 )
 
+DEMO_USERS = [
+    {
+        "user_id": "demo_alice",
+        "first_name": "Alice",
+        "last_name": "Morgan",
+        "email": "alice.demo@example.com",
+        "password": "DemoPass123",
+        "gender": "Female",
+        "birth_date": "1992-04-18",
+        "phone_number": "555-0101",
+        "address": "101 Demo Street",
+        "balance": 7425.50,
+    },
+    {
+        "user_id": "demo_bob",
+        "first_name": "Bob",
+        "last_name": "Rivera",
+        "email": "bob.demo@example.com",
+        "password": "DemoPass123",
+        "gender": "Male",
+        "birth_date": "1988-09-07",
+        "phone_number": "555-0102",
+        "address": "202 Showcase Avenue",
+        "balance": 3180.75,
+    },
+]
+
+DEMO_TRANSACTIONS = {
+    "demo_alice": [
+        ("Deposit", "20/05/26 09:15:00", "Demo seed: Payroll deposit", 2500.00),
+        ("Withdrawal", "21/05/26 12:40:00", "Demo seed: Grocery shopping", 86.45),
+        ("Transfer", "22/05/26 10:05:00", "Demo seed: Sent rent share", 750.00),
+    ],
+    "demo_bob": [
+        ("Deposit", "20/05/26 11:30:00", "Demo seed: Client payment", 1200.00),
+        ("Withdrawal", "21/05/26 16:20:00", "Demo seed: Utilities", 142.30),
+        ("Transfer", "22/05/26 10:05:00", "Demo seed: Received rent share", 750.00),
+    ],
+}
+
 def using_mysql() -> bool:
     return bool(os.environ.get("MYSQL_HOST")) or os.environ.get("DB_ENGINE", "").lower() == "mysql"
 
@@ -92,6 +132,7 @@ def init_db():
         """)
 
         conn.commit()
+        _seed_demo_data(conn, cursor)
         conn.close()
         return
 
@@ -125,7 +166,65 @@ def init_db():
     """)
 
     conn.commit()
+    _seed_demo_data(conn, cursor)
     conn.close()
+
+def _seed_demo_data(conn, cursor):
+    for user in DEMO_USERS:
+        if using_mysql():
+            cursor.execute("""
+                INSERT IGNORE INTO users (
+                    user_id, first_name, last_name, email, password,
+                    gender, birth_date, phone_number, address, balance
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                user["user_id"], user["first_name"], user["last_name"],
+                user["email"], user["password"], user["gender"],
+                user["birth_date"], user["phone_number"], user["address"],
+                user["balance"],
+            ))
+        else:
+            cursor.execute("""
+                INSERT OR IGNORE INTO users (
+                    user_id, first_name, last_name, email, password,
+                    gender, birth_date, phone_number, address, balance
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                user["user_id"], user["first_name"], user["last_name"],
+                user["email"], user["password"], user["gender"],
+                user["birth_date"], user["phone_number"], user["address"],
+                user["balance"],
+            ))
+
+    for user_id, transactions in DEMO_TRANSACTIONS.items():
+        for tx_type, tx_date, description, amount in transactions:
+            if _demo_transaction_exists(cursor, user_id, description):
+                continue
+            if using_mysql():
+                cursor.execute("""
+                    INSERT INTO transactions (user_id, type, `date`, description, amount)
+                    VALUES (%s,%s,%s,%s,%s)
+                """, (user_id, tx_type, tx_date, description, amount))
+            else:
+                cursor.execute("""
+                    INSERT INTO transactions (user_id, type, date, description, amount)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (user_id, tx_type, tx_date, description, amount))
+
+    conn.commit()
+
+def _demo_transaction_exists(cursor, user_id, description):
+    if using_mysql():
+        cursor.execute(
+            "SELECT 1 FROM transactions WHERE user_id = %s AND description = %s LIMIT 1",
+            (user_id, description)
+        )
+    else:
+        cursor.execute(
+            "SELECT 1 FROM transactions WHERE user_id = ? AND description = ? LIMIT 1",
+            (user_id, description)
+        )
+    return cursor.fetchone() is not None
 
 def insert_user(user_id, first_name, last_name, email, password,
                 gender, birth_date, phone_number, address, balance):

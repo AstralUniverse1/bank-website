@@ -67,6 +67,11 @@ jobs:
               && curl -fsS http://127.0.0.1:5000/readyz \
               && curl -fsS http://127.0.0.1:5000/ > /tmp/bank-app-smoke.html; then
               grep -q "Login Page" /tmp/bank-app-smoke.html
+              curl -fsS \
+                -H "Content-Type: application/json" \
+                -d '{"user_id":"demo_alice","password":"DemoPass123"}' \
+                http://127.0.0.1:5000/api/login > /tmp/bank-app-login.json
+              grep -q '"status":true' /tmp/bank-app-login.json
               exit 0
             fi
             sleep 1

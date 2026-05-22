@@ -6,6 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     GUNICORN_WORKERS=2 \
     GUNICORN_THREADS=4 \
     GUNICORN_TIMEOUT=60 \
+    DB_PATH=/data/bank_website.db \
     HOME=/tmp
 
 WORKDIR /app
@@ -19,7 +20,9 @@ RUN groupadd --system --gid 10001 appuser \
 COPY --chown=appuser:appuser backend/ backend/
 COPY --chown=appuser:appuser frontend/ frontend/
 
-RUN rm -f /app/backend/*.db \
+RUN mkdir -p /data \
+    && rm -f /app/backend/*.db \
+    && chown -R appuser:appuser /data \
     && chown -R appuser:appuser /app
 
 EXPOSE 5000

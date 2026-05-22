@@ -23,6 +23,19 @@ This repo owns the application code, Docker image, and CI workflow. Kubernetes d
 | Database | SQLite by default, generated untracked; MySQL when `MYSQL_HOST` is set or `DB_ENGINE=mysql` |
 | Health checks | `/healthz` and `/readyz` |
 
+## Demo Access
+
+The app seeds two showcase users when it starts against a new or empty database:
+
+| User ID | Password |
+| --- | --- |
+| `demo_alice` | `DemoPass123` |
+| `demo_bob` | `DemoPass123` |
+
+Seed data is created only when missing, so normal app restarts preserve balances and transactions. If the local SQLite file or external MySQL database is recreated, the demo users and sample transactions are created again automatically.
+
+Local SQLite database files are runtime artifacts and are ignored by git. The container image also removes baked-in `*.db` files and writes SQLite data to `/data/bank_website.db` by default.
+
 ## CI Workflow
 
 The workflow runs on pushes to `main` and manual `workflow_dispatch` runs.
