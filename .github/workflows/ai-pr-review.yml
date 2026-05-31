@@ -32,26 +32,39 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       GITHUB_TOKEN: ${{ github.token }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      AI_PR_REVIEWER_REPO: AstralUniverse1/ai-pr-reviewer
+      AI_PR_REVIEWER_SHA: f58050435a28050baaf1f731d8a6748a0d55c9e1
       PROJECT_CONTEXT: Demo Flask banking app with static frontend, SQLite/MySQL persistence, Docker image build, and GitOps deployment. Review for showcase-quality correctness, validation, auth, permission, workflow, and regression risks.
       PR_SUMMARY: ${{ github.event.pull_request.title || github.event.issue.title }}
+      PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+      IS_FOLLOW_UP: ${{ github.event_name == 'issue_comment' }}
 
     steps:
-      - name: Checkout trusted reviewer code
+      - name: Checkout trusted target repo code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
           fetch-depth: 0
 
       - name: Fetch PR head for diff only
-        run: git fetch --no-tags origin "pull/${{ github.event.pull_request.number || github.event.issue.number }}/head:refs/remotes/origin/pr-head"
+        run: git fetch --no-tags origin "pull/${PR_NUMBER}/head:refs/remotes/origin/pr-head"
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      - name: Fetch pinned AI reviewer
+        run: |
+          REVIEWER_DIR="$RUNNER_TEMP/ai-pr-reviewer"
+          git init "$REVIEWER_DIR"
+          git -C "$REVIEWER_DIR" remote add origin "https://github.com/${AI_PR_REVIEWER_REPO}.git"
+          git -C "$REVIEWER_DIR" fetch --depth=1 origin "$AI_PR_REVIEWER_SHA"
+          git -C "$REVIEWER_DIR" checkout --detach FETCH_HEAD
+          test "$(git -C "$REVIEWER_DIR" rev-parse HEAD)" = "$AI_PR_REVIEWER_SHA"
+
       - name: Install trusted reviewer dependencies
-        run: python -m pip install -r tools/ai-pr-reviewer/requirements.txt
+        run: python -m pip install -r "$RUNNER_TEMP/ai-pr-reviewer/requirements.txt"
 
       - name: Validate workflow environment
         run: |
@@ -59,43 +72,39 @@ jobs:
           test -n "$OPENAI_API_KEY" || { echo "::error::OPENAI_API_KEY secret is not available"; exit 1; }
 
       - name: Validate sanitized review input
-        if: github.event_name == 'pull_request_target'
-        run: >-
-          python tools/ai-pr-reviewer/main.py
-          --github
-          --dry-run
-          --repo-path .
-          --project-context "$PROJECT_CONTEXT"
-          --pr-summary "$PR_SUMMARY"
-          >/tmp/ai-pr-review-input.json
-
-      - name: Validate sanitized follow-up input
-        if: github.event_name == 'issue_comment'
-        run: >-
-          python tools/ai-pr-reviewer/main.py
-          --github
-          --follow-up
-          --dry-run
-          --repo-path .
-          --project-context "$PROJECT_CONTEXT"
-          --pr-summary "$PR_SUMMARY"
-          >/tmp/ai-pr-review-input.json
+        run: |
+          if [ "$IS_FOLLOW_UP" = "true" ]; then
+            python "$RUNNER_TEMP/ai-pr-reviewer/main.py" \
+              --github \
+              --follow-up \
+              --dry-run \
+              --repo-path "$GITHUB_WORKSPACE" \
+              --project-context "$PROJECT_CONTEXT" \
+              --pr-summary "$PR_SUMMARY" \
+              >/tmp/ai-pr-review-input.json
+          else
+            python "$RUNNER_TEMP/ai-pr-reviewer/main.py" \
+              --github \
+              --dry-run \
+              --repo-path "$GITHUB_WORKSPACE" \
+              --project-context "$PROJECT_CONTEXT" \
+              --pr-summary "$PR_SUMMARY" \
+              >/tmp/ai-pr-review-input.json
+          fi
 
       - name: Run AI PR review
-        if: github.event_name == 'pull_request_target'
-        run: >-
-          python tools/ai-pr-reviewer/main.py
-          --github
-          --repo-path .
-          --project-context "$PROJECT_CONTEXT"
-          --pr-summary "$PR_SUMMARY"
-
-      - name: Run AI PR follow-up
-        if: github.event_name == 'issue_comment'
-        run: >-
-          python tools/ai-pr-reviewer/main.py
-          --github
-          --follow-up
-          --repo-path .
-          --project-context "$PROJECT_CONTEXT"
-          --pr-summary "$PR_SUMMARY"
+        run: |
+          if [ "$IS_FOLLOW_UP" = "true" ]; then
+            python "$RUNNER_TEMP/ai-pr-reviewer/main.py" \
+              --github \
+              --follow-up \
+              --repo-path "$GITHUB_WORKSPACE" \
+              --project-context "$PROJECT_CONTEXT" \
+              --pr-summary "$PR_SUMMARY"
+          else
+            python "$RUNNER_TEMP/ai-pr-reviewer/main.py" \
+              --github \
+              --repo-path "$GITHUB_WORKSPACE" \
+              --project-context "$PROJECT_CONTEXT" \
+              --pr-summary "$PR_SUMMARY"
+          fi
