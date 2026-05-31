@@ -41,6 +41,33 @@ class SanitizedChangedFile:
 
 
 @dataclass(frozen=True)
+class ConversationComment:
+    author: str
+    author_type: str
+    created_at: str
+    body: str
+    is_bot: bool = False
+    is_triggering: bool = False
+
+
+@dataclass(frozen=True)
+class SanitizedConversationComment:
+    author: str
+    author_type: str
+    created_at: str
+    body: str
+    is_bot: bool = False
+    is_triggering: bool = False
+
+
+@dataclass(frozen=True)
+class ConversationContext:
+    comments: list[SanitizedConversationComment]
+    total_relevant_comments: int
+    omitted_comments: int
+
+
+@dataclass(frozen=True)
 class DiffStats:
     total_files_changed: int
     total_added_lines: int
@@ -61,12 +88,15 @@ class ReviewHints:
 class SanitizedReviewInput:
     project_context: str
     pr_summary: str
+    pr_description: str
     changed_files: list[SanitizedChangedFile]
     diff: str
     rules: list[str]
     diff_stats: DiffStats
     review_hints: ReviewHints
+    reviewer_safety_rules: list[str]
     project_rules: list[str]
+    conversation: ConversationContext
 
     def to_model_payload(self) -> dict[str, Any]:
         return asdict(self)

@@ -3,6 +3,8 @@ name: AI PR Review
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: read
@@ -11,7 +13,19 @@ permissions:
 
 jobs:
   review:
-    if: github.event.pull_request.draft == false
+    if: >-
+      ${{
+        (
+          github.event_name == 'pull_request_target' &&
+          github.event.pull_request.draft == false
+        ) ||
+        (
+          github.event_name == 'issue_comment' &&
+          github.event.issue.pull_request &&
+          github.event.comment.user.type != 'Bot' &&
+          contains(github.event.comment.body, '/ai-reviewer')
+        )
+      }}
     runs-on: ubuntu-latest
 
     env:
@@ -19,17 +33,17 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       PROJECT_CONTEXT: Demo Flask banking app with static frontend, SQLite/MySQL persistence, Docker image build, and GitOps deployment. Review for showcase-quality correctness, validation, auth, permission, workflow, and regression risks.
-      PR_SUMMARY: ${{ github.event.pull_request.title }}
+      PR_SUMMARY: ${{ github.event.pull_request.title || github.event.issue.title }}
 
     steps:
       - name: Checkout trusted reviewer code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
           fetch-depth: 0
 
       - name: Fetch PR head for diff only
-        run: git fetch --no-tags origin "pull/${{ github.event.pull_request.number }}/head:refs/remotes/origin/pr-head"
+        run: git fetch --no-tags origin "pull/${{ github.event.pull_request.number || github.event.issue.number }}/head:refs/remotes/origin/pr-head"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -45,6 +59,7 @@ jobs:
           test -n "$OPENAI_API_KEY" || { echo "::error::OPENAI_API_KEY secret is not available"; exit 1; }
 
       - name: Validate sanitized review input
+        if: github.event_name == 'pull_request_target'
         run: >-
           python tools/ai-pr-reviewer/main.py
           --github
@@ -54,10 +69,33 @@ jobs:
           --pr-summary "$PR_SUMMARY"
           >/tmp/ai-pr-review-input.json
 
-      - name: Run AI PR review
+      - name: Validate sanitized follow-up input
+        if: github.event_name == 'issue_comment'
         run: >-
           python tools/ai-pr-reviewer/main.py
           --github
+          --follow-up
+          --dry-run
+          --repo-path .
+          --project-context "$PROJECT_CONTEXT"
+          --pr-summary "$PR_SUMMARY"
+          >/tmp/ai-pr-review-input.json
+
+      - name: Run AI PR review
+        if: github.event_name == 'pull_request_target'
+        run: >-
+          python tools/ai-pr-reviewer/main.py
+          --github
+          --repo-path .
+          --project-context "$PROJECT_CONTEXT"
+          --pr-summary "$PR_SUMMARY"
+
+      - name: Run AI PR follow-up
+        if: github.event_name == 'issue_comment'
+        run: >-
+          python tools/ai-pr-reviewer/main.py
+          --github
+          --follow-up
           --repo-path .
           --project-context "$PROJECT_CONTEXT"
           --pr-summary "$PR_SUMMARY"
